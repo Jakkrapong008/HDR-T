@@ -66,14 +66,14 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            /* Removed table-layout: fixed; to revert to original behavior */
+            /* Reverted table-layout: fixed; to allow natural column sizing */
         }
         
         th, td {
             padding: 12px;
             border-bottom: 1px solid #fecaca;
             white-space: nowrap; /* Prevent text wrapping in table headers/cells */
-            /* Removed word-break and overflow-wrap to revert to original behavior */
+            /* Reverted word-break and overflow-wrap to allow natural wrapping */
         }
         
         th {
@@ -160,13 +160,13 @@
                     <span class="text-3xl mb-2">📝</span>
                     <span class="font-medium text-center">สารสนเทศการปฏิบัติงานของครู</span>
                 </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="window.open('https://cld-t-68.vercel.app/', '_blank')">
+                    <span class="text-3xl mb-2">🗓️</span>
+                    <span class="font-medium text-center">ปฏิทินกิจกรรมสำหรับครู</span>
+                </button>
                 <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section2')">
                     <span class="text-3xl mb-2">📚</span>
                     <span class="font-medium text-center">กลุ่มงานวิชาการ</span>
-                </button>
-                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section3')">
-                    <span class="text-3xl mb-2">👨‍👩‍👧‍👦</span>
-                    <span class="font-medium text-center">กลุ่มงานกิจการนักเรียน</span>
                 </button>
                 <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section4')">
                     <span class="text-3xl mb-2">🏫</span>
@@ -315,14 +315,6 @@
                                 </div>
                             </div>
                         </a>
-                    </div>
-                </div>
-
-                <div id="section3" class="hidden">
-                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานกิจการนักเรียน 👨‍👩‍👧‍👦</h2>
-                    <div class="bg-red-50 p-6 rounded-lg text-center">
-                        <p class="text-lg">อยู่ระหว่างการพัฒนาระบบ</p>
-                        <p class="text-gray-600 mt-2">ขออภัยในความไม่สะดวก</p>
                     </div>
                 </div>
 
@@ -759,8 +751,6 @@
             document.getElementById('status').value = 'รอส่งงาน';
             searchTeacherWorks();
         }
-        
-        // Removed the downloadTeacherWorksCSV function as per request
         
         // Section 4: Activities
         document.getElementById('searchBtn4').addEventListener('click', searchActivities);
