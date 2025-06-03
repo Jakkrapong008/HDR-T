@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสารสนเทศการปฏิบัติงาน - โรงเรียนหางดงรัฐราษฎร์อุปถัมภ์</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.7/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.7/plugin/isSameOrBefore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.7/plugin/isSameOrAfter.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.7/locale/th.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <style>
+        * {
+            font-family: 'Sarabun', sans-serif;
+        }
+        
+        body {
+            background-color: #fff5f5;
+        }
+        
+        .btn-primary {
+            background-color: #f87171;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #ef4444;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-secondary {
+            background-color: #fecaca;
+            color: #7f1d1d;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #fca5a5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .header-animation {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        
+        .menu-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-container {
+            overflow-x: auto; /* Allows horizontal scrolling if content is too wide */
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            /* Removed table-layout: fixed; to revert to original behavior */
+        }
+        
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #fecaca;
+            white-space: nowrap; /* Prevent text wrapping in table headers/cells */
+            /* Removed word-break and overflow-wrap to revert to original behavior */
+        }
+        
+        th {
+            background-color: #fecaca;
+            color: #7f1d1d;
+            font-weight: 600;
+            text-align: left;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #fff1f1;
+        }
+        
+        tr:hover {
+            background-color: #fee2e2;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(248, 113, 113, 0.3);
+            border-radius: 50%;
+            border-top-color: #f87171;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white shadow-md p-4 md:p-6">
+            <div class="container mx-auto flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <img src="https://img2.pic.in.th/pic/logo-HDR.md.png" alt="โลโก้โรงเรียน" class="h-16 md:h-20 mr-4">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-red-500 header-animation">ระบบสารสนเทศการปฏิบัติงาน 📊</h1>
+                        <h2 class="text-xl md:text-2xl font-bold text-red-400 header-animation">ของคณะครูและบุคลากรทางการศึกษา 👨‍🏫 👩‍🏫</h2>
+                        <p class="text-gray-600 header-animation">โรงเรียนหางดงรัฐราษฎร์อุปถัมภ์</p>
+                    </div>
+                </div>
+                </div>
+        </header>
+
+        <main class="flex-grow container mx-auto p-4 md:p-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section1')">
+                    <span class="text-3xl mb-2">📝</span>
+                    <span class="font-medium text-center">สารสนเทศการปฏิบัติงานของครู</span>
+                </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section2')">
+                    <span class="text-3xl mb-2">📚</span>
+                    <span class="font-medium text-center">กลุ่มงานวิชาการ</span>
+                </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section3')">
+                    <span class="text-3xl mb-2">👨‍👩‍👧‍👦</span>
+                    <span class="font-medium text-center">กลุ่มงานกิจการนักเรียน</span>
+                </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section4')">
+                    <span class="text-3xl mb-2">🏫</span>
+                    <span class="font-medium text-center">กลุ่มงานบริหารทั่วไป</span>
+                </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section5')">
+                    <span class="text-3xl mb-2">👥</span>
+                    <span class="font-medium text-center">กลุ่มงานบุคคล</span>
+                </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section6')">
+                    <span class="text-3xl mb-2">📄</span>
+                    <span class="font-medium text-center">กลุ่มงานธุรการ</span>
+                </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section7')">
+                    <span class="text-3xl mb-2">💰</span>
+                    <span class="font-medium text-center">กลุ่มงานงบประมาณ</span>
+                </button>
+                <button class="menu-btn bg-gradient-to-r from-red-200 to-red-300 text-red-800 p-4 rounded-lg shadow-md flex flex-col items-center justify-center h-32" onclick="showSection('section8')">
+                    <span class="text-3xl mb-2">📊</span>
+                    <span class="font-medium text-center">กลุ่มงานแผนงาน</span>
+                </button>
+            </div>
+
+            <div id="content-container" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div id="section1" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">สารสนเทศการปฏิบัติงานของครู 📝</h2>
+                    
+                    <div class="bg-red-50 p-4 rounded-lg mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ผู้เกี่ยวข้อง</label>
+                                <select id="personInvolved" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="ครูทุกคน">ครูทุกคน</option>
+                                    <option value="หัวหน้ากลุ่มสาระ">หัวหน้ากลุ่มสาระ</option>
+                                    <option value="หัวหน้างาน">หัวหน้างาน</option>
+                                    <option value="หัวหน้าโครงการ">หัวหน้าโครงการ</option>
+                                    <option value="ผู้รับผิดชอบ">ผู้รับผิดชอบ</option>
+                                    <option value="ครูประจำชั้น">ครูประจำชั้น</option>
+                                    <option value="หัวหน้างาน/หัวหน้ากลุ่มสาระ">หัวหน้างาน/หัวหน้ากลุ่มสาระ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">กลุ่มงาน</label>
+                                <select id="department" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="กลุ่มงานวิชาการ">กลุ่มงานวิชาการ</option>
+                                    <option value="กลุ่มงานกิจการนักเรียน">กลุ่มงานกิจการนักเรียน</option>
+                                    <option value="กลุ่มงานบริหารทั่วไป">กลุ่มงานบริหารทั่วไป</option>
+                                    <option value="กลุ่มงานบุคคล">กลุ่มงานบุคคล</option>
+                                    <option value="กลุ่มงานธุรการ">กลุ่มงานธุรการ</option>
+                                    <option value="กลุ่มงานงบประมาณ">กลุ่มงานงบประมาณ</option>
+                                    <option value="กลุ่มงานแผนงาน">กลุ่มงานแผนงาน</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ชื่องาน</label>
+                                <input type="text" id="workName" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">สถานะ</label>
+                                <select id="status" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                                    <option value="ทั้งหมด">ทั้งหมด</option>
+                                    <option value="รอส่งงาน" selected>รอส่งงาน</option>
+                                    <option value="หมดเวลาส่งงาน">หมดเวลาส่งงาน</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button id="clearSearch1" class="btn-secondary px-4 py-2 rounded-md mr-2">
+                                <span class="mr-1">🔄</span> ล้างค่าการค้นหา
+                            </button>
+                            <button id="searchBtn1" class="btn-primary px-4 py-2 rounded-md">
+                                <span class="mr-1">🔍</span> ค้นหา
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="loading1" class="hidden flex justify-center my-8">
+                        <div class="loading"></div>
+                    </div>
+                    
+                    <div id="results1" class="hidden">
+                        <div class="table-container mb-6">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr>
+                                        <th>วันที่ครบกำหนดส่ง</th>
+                                        <th>ส่งภายในเวลา</th>
+                                        <th>ผู้เกี่ยวข้อง</th>
+                                        <th>กลุ่มงาน</th>
+                                        <th>ชื่องาน</th>
+                                        <th>รายละเอียด</th>
+                                        <th>การส่งงาน</th>
+                                        <th>ตรวจสอบการส่งงาน</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teacherWorkTable">
+                                    </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="bg-red-50 p-4 rounded-lg mb-6">
+                            <h3 class="text-lg font-semibold text-red-700 mb-2">สรุปข้อมูล</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <p class="font-medium">จำนวนงานทั้งหมด: <span id="totalWorks" class="font-bold text-red-600">0</span> งาน</p>
+                                </div>
+                                <div>
+                                    <p class="font-medium mb-1">ผู้เกี่ยวข้อง:</p>
+                                    <div id="involvedSummary" class="text-sm"></div>
+                                </div>
+                                <div>
+                                    <p class="font-medium mb-1">กลุ่มงาน:</p>
+                                    <div id="departmentSummary" class="text-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        </div>
+                    
+                    <div id="noResults1" class="hidden text-center py-8">
+                        <p class="text-lg text-gray-600">ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</p>
+                        <p class="text-gray-500 mt-2">กรุณาลองเปลี่ยนเงื่อนไขการค้นหาใหม่</p>
+                    </div>
+                </div>
+
+                <div id="section2" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานวิชาการ 📚</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <a href="https://edu-info.vercel.app/" target="_blank" class="block bg-gradient-to-r from-red-100 to-red-200 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="flex items-center">
+                                <div class="text-4xl mr-4">🏆</div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-red-700">สารสนเทศผลงานครูและนักเรียน</h3>
+                                    <p class="text-gray-600 mt-2">ระบบรวบรวมผลงานและความสำเร็จของครูและนักเรียน</p>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="https://hdr-garden.vercel.app/" target="_blank" class="block bg-gradient-to-r from-red-100 to-red-200 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="flex items-center">
+                                <div class="text-4xl mr-4">🌱</div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-red-700">ระบบบูรณาการงานสวนพฤกษศาสตร์โรงเรียน</h3>
+                                    <p class="text-gray-600 mt-2">ระบบจัดการข้อมูลงานสวนพฤกษศาสตร์โรงเรียน</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="section3" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานกิจการนักเรียน 👨‍👩‍👧‍👦</h2>
+                    <div class="bg-red-50 p-6 rounded-lg text-center">
+                        <p class="text-lg">อยู่ระหว่างการพัฒนาระบบ</p>
+                        <p class="text-gray-600 mt-2">ขออภัยในความไม่สะดวก</p>
+                    </div>
+                </div>
+
+                <div id="section4" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานบริหารทั่วไป 🏫</h2>
+                    
+                    <div class="bg-red-50 p-4 rounded-lg mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">วันที่จัดกิจกรรม (เริ่มต้น)</label>
+                                <input type="date" id="activityStartDate" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">วันที่จัดกิจกรรม (สิ้นสุด)</label>
+                                <input type="date" id="activityEndDate" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อกิจกรรม</label>
+                                <input type="text" id="activityName" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">กลุ่มงาน</label>
+                                <select id="activityDepartment" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="กลุ่มงานวิชาการ">กลุ่มงานวิชาการ</option>
+                                    <option value="กลุ่มงานกิจการนักเรียน">กลุ่มงานกิจการนักเรียน</option>
+                                    <option value="กลุ่มงานบริหารทั่วไป">กลุ่มงานบริหารทั่วไป</option>
+                                    <option value="กลุ่มงานบุคคล">กลุ่มงานบุคคล</option>
+                                    <option value="กลุ่มงานธุรการ">กลุ่มงานธุรการ</option>
+                                    <option value="กลุ่มงานงบประมาณ">กลุ่มงานงบประมาณ</option>
+                                    <option value="กลุ่มงานแผนงาน">กลุ่มงานแผนงาน</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button id="clearSearch4" class="btn-secondary px-4 py-2 rounded-md mr-2">
+                                <span class="mr-1">🔄</span> ล้างค่าการค้นหา
+                            </button>
+                            <button id="searchBtn4" class="btn-primary px-4 py-2 rounded-md">
+                                <span class="mr-1">🔍</span> ค้นหา
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="loading4" class="hidden flex justify-center my-8">
+                        <div class="loading"></div>
+                    </div>
+                    
+                    <div id="results4" class="hidden">
+                        <div class="table-container">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr>
+                                        <th>วันที่จัดกิจกรรม</th>
+                                        <th>ชื่อกิจกรรม</th>
+                                        <th>กลุ่มงาน</th>
+                                        <th>ลิงก์</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activitiesTable">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="noResults4" class="hidden text-center py-8">
+                        <p class="text-lg text-gray-600">ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</p>
+                        <p class="text-gray-500 mt-2">กรุณาลองเปลี่ยนเงื่อนไขการค้นหาใหม่</p>
+                    </div>
+                </div>
+
+                <div id="section5" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานบุคคล 👥</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <a href="https://hrhdr-1.vercel.app/" target="_blank" class="block bg-gradient-to-r from-red-100 to-red-200 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="flex items-center">
+                                <div class="text-4xl mr-4">📅</div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-red-700">สารสนเทศการมาปฏิบัติงาน</h3>
+                                    <p class="text-gray-600 mt-2">ระบบบันทึกและตรวจสอบการมาปฏิบัติงานของบุคลากร</p>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="https://hrhdr-2.vercel.app/" target="_blank" class="block bg-gradient-to-r from-red-100 to-red-200 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="flex items-center">
+                                <div class="text-4xl mr-4">📋</div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-red-700">ระบบตรวจสอบคำสั่ง</h3>
+                                    <p class="text-gray-600 mt-2">ระบบค้นหาและตรวจสอบคำสั่งต่างๆ ของโรงเรียน</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="section6" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานธุรการ 📄</h2>
+                    
+                    <div class="bg-red-50 p-4 rounded-lg mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">เลขที่คำสั่ง</label>
+                                <input type="text" id="orderNumber" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">กลุ่มงาน</label>
+                                <select id="orderDepartment" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                                    <option value="">ทั้งหมด</option>
+                                    <option value="กลุ่มงานวิชาการ">กลุ่มงานวิชาการ</option>
+                                    <option value="กลุ่มงานกิจการนักเรียน">กลุ่มงานกิจการนักเรียน</option>
+                                    <option value="กลุ่มงานบริหารทั่วไป">กลุ่มงานบริหารทั่วไป</option>
+                                    <option value="กลุ่มงานบุคคล">กลุ่มงานบุคคล</option>
+                                    <option value="กลุ่มงานธุรการ">กลุ่มงานธุรการ</option>
+                                    <option value="กลุ่มงานงบประมาณ">กลุ่มงานงบประมาณ</option>
+                                    <option value="กลุ่มงานแผนงาน">กลุ่มงานแผนงาน</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">เรื่อง</label>
+                                <input type="text" id="orderSubject" class="w-full px-3 py-2 border border-red-200 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button id="clearSearch6" class="btn-secondary px-4 py-2 rounded-md mr-2">
+                                <span class="mr-1">🔄</span> ล้างค่าการค้นหา
+                            </button>
+                            <button id="searchBtn6" class="btn-primary px-4 py-2 rounded-md">
+                                <span class="mr-1">🔍</span> ค้นหา
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="loading6" class="hidden flex justify-center my-8">
+                        <div class="loading"></div>
+                    </div>
+                    
+                    <div id="results6" class="hidden">
+                        <div class="table-container">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr>
+                                        <th>เลขที่คำสั่ง</th>
+                                        <th>ลงวันที่</th>
+                                        <th>กลุ่มงาน</th>
+                                        <th>เรื่อง</th>
+                                        <th>ดาวน์โหลด</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ordersTable">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="noResults6" class="hidden text-center py-8">
+                        <p class="text-lg text-gray-600">ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</p>
+                        <p class="text-gray-500 mt-2">กรุณาลองเปลี่ยนเงื่อนไขการค้นหาใหม่</p>
+                    </div>
+                </div>
+
+                <div id="section7" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานงบประมาณ 💰</h2>
+                    <div class="bg-red-50 p-6 rounded-lg text-center">
+                        <p class="text-lg">อยู่ระหว่างการพัฒนาระบบ</p>
+                        <p class="text-gray-600 mt-2">ขออภัยในความไม่สะดวก</p>
+                    </div>
+                </div>
+
+                <div id="section8" class="hidden">
+                    <h2 class="text-2xl font-bold text-red-600 mb-6">กลุ่มงานแผนงาน 📊</h2>
+                    
+                    <div class="mb-6">
+                        <a href="https://krumilkz.my.canva.site/planhdr" target="_blank" class="block bg-gradient-to-r from-red-100 to-red-200 p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="flex items-center">
+                                <div class="text-4xl mr-4">💵</div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-red-700">ระบบตรวจสอบงบประมาณในโครงการ</h3>
+                                    <p class="text-gray-600 mt-2">ระบบตรวจสอบและติดตามการใช้งบประมาณในโครงการต่างๆ</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-red-600 mb-4">ข้อมูลฝ่ายแผน</h3>
+                    
+                    <div id="loading8" class="flex justify-center my-8">
+                        <div class="loading"></div>
+                    </div>
+                    
+                    <div id="results8" class="hidden">
+                        <div class="table-container">
+                            <table class="min-w-full">
+                                <thead id="planTableHead">
+                                    </thead>
+                                <tbody id="planTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="noResults8" class="hidden text-center py-8">
+                        <p class="text-lg text-gray-600">ไม่พบข้อมูล</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-red-600 text-white p-4">
+            <div class="container mx-auto text-center">
+                <p>จัดทำโดย โรงเรียนหางดงรัฐราษฎร์อุปถัมภ์ 🏫</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // API URL
+        const API_URL = "https://script.google.com/macros/s/AKfycbxDe0thufCyhmcYEgCzOl-3Pirlj91WI3Wqy3DtAeTAD5FJYw1WJkE2fnMUzmjsYQMF/exec";
+        const SHEET_ID = "1Ub-IlDgkqEjeLca8owQyVK4WmyeS4FF5o61UZ9XUYN0";
+        
+        // Initialize dayjs with Thai locale
+        dayjs.locale('th');
+        
+        // Extend dayjs with isSameOrBefore and isSameOrAfter plugins
+        dayjs.extend(dayjs_plugin_isSameOrBefore);
+        dayjs.extend(dayjs_plugin_isSameOrAfter);
+        
+        // Animation for header
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate header elements
+            anime({
+                targets: '.header-animation',
+                opacity: [0, 1],
+                translateY: [-20, 0],
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad',
+                duration: 800
+            });
+            
+            // Load plan data on page load
+            fetchPlanData();
+
+            // Initially show section1 content
+            showSection('section1');
+        });
+        
+        // Show section function
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('#content-container > div').forEach(div => {
+                div.classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.getElementById(sectionId).classList.add('fade-in');
+            
+            // If section1 is shown and no search has been performed yet, show pending tasks
+            if (sectionId === 'section1' && !document.getElementById('results1').classList.contains('fade-in')) {
+                document.getElementById('status').value = 'รอส่งงาน';
+                searchTeacherWorks();
+            }
+            
+            // If section4 is shown, load activities data
+            if (sectionId === 'section4' && !document.getElementById('results4').classList.contains('fade-in')) {
+                searchActivities();
+            }
+            
+            // If section6 is shown, load orders data
+            if (sectionId === 'section6' && !document.getElementById('results6').classList.contains('fade-in')) {
+                searchOrders();
+            }
+            
+            // If section8 is shown, ensure plan data is loaded
+            if (sectionId === 'section8') {
+                if (document.getElementById('results8').classList.contains('hidden')) {
+                    fetchPlanData();
+                }
+            }
+            
+            // Scroll to top of the section
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Section 1: Teacher Works
+        document.getElementById('searchBtn1').addEventListener('click', searchTeacherWorks);
+        document.getElementById('clearSearch1').addEventListener('click', clearSearch1);
+        // Removed the event listener for downloadCSV button
+        
+        function searchTeacherWorks() {
+            const personInvolved = document.getElementById('personInvolved').value;
+            const department = document.getElementById('department').value;
+            const workName = document.getElementById('workName').value;
+            const status = document.getElementById('status').value;
+            
+            // Show loading
+            document.getElementById('loading1').classList.remove('hidden');
+            document.getElementById('results1').classList.add('hidden');
+            document.getElementById('noResults1').classList.add('hidden');
+            
+            // Fetch data
+            fetch(`${API_URL}?action=getTeacherWorks&sheetId=${SHEET_ID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to fetch data');
+                    }
+                    
+                    let filteredData = data.data;
+                    const today = dayjs().format('YYYY-MM-DD');
+                    
+                    // Apply filters
+                    if (personInvolved) {
+                        filteredData = filteredData.filter(item => item[3] === personInvolved);
+                    }
+                    
+                    if (department) {
+                        filteredData = filteredData.filter(item => item[4] === department);
+                    }
+                    
+                    if (workName) {
+                        filteredData = filteredData.filter(item => 
+                            item[5].toLowerCase().includes(workName.toLowerCase())
+                        );
+                    }
+                    
+                    if (status === 'รอส่งงาน') {
+                        filteredData = filteredData.filter(item => {
+                            const itemDate = dayjs(item[1]).format('YYYY-MM-DD');
+                            return dayjs(itemDate).isAfter(today) || dayjs(itemDate).isSame(today);
+                        });
+                    } else if (status === 'หมดเวลาส่งงาน') {
+                        filteredData = filteredData.filter(item => {
+                            const itemDate = dayjs(item[1]).format('YYYY-MM-DD');
+                            return dayjs(itemDate).isBefore(today);
+                        });
+                    }
+                    
+                    // Sort by due date (มากไปน้อย - descending)
+                    filteredData.sort((a, b) => {
+                        return new Date(b[1]) - new Date(a[1]);
+                    });
+                    
+                    // Display results
+                    displayTeacherWorks(filteredData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message || 'ไม่สามารถดึงข้อมูลได้',
+                        confirmButtonColor: '#ef4444'
+                    });
+                    document.getElementById('loading1').classList.add('hidden');
+                });
+        }
+        
+        function displayTeacherWorks(data) {
+            const tableBody = document.getElementById('teacherWorkTable');
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                document.getElementById('loading1').classList.add('hidden');
+                document.getElementById('results1').classList.add('hidden');
+                document.getElementById('noResults1').classList.remove('hidden');
+                return;
+            }
+            
+            // Process data for display and summary
+            const involvedCounts = {};
+            const departmentCounts = {};
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // Format date
+                const dueDate = dayjs(row[1]).format('DD/MM/YYYY');
+                
+                // Create cells, with link buttons for columns H (index 7) and I (index 8) if they are valid URLs
+                tr.innerHTML = `
+                    <td>${dueDate}</td>
+                    <td>${row[2]}</td>
+                    <td>${row[3]}</td>
+                    <td>${row[4]}</td>
+                    <td>${row[5]}</td>
+                    <td>${row[6]}</td>
+                    <td>${isValidUrl(row[7]) ? 
+                        `<a href="${row[7]}" target="_blank" class="btn-primary px-3 py-1 rounded-md inline-block text-sm">เปิดลิงก์</a>` : 
+                        (row[7] || '-')}
+                    </td>
+                    <td>${isValidUrl(row[8]) ? 
+                        `<a href="${row[8]}" target="_blank" class="btn-primary px-3 py-1 rounded-md inline-block text-sm">ตรวจสอบ</a>` : 
+                        (row[8] || '-')}
+                    </td>
+                `;
+                
+                tableBody.appendChild(tr);
+                
+                // Count for summary
+                if (row[3]) {
+                    involvedCounts[row[3]] = (involvedCounts[row[3]] || 0) + 1;
+                }
+                
+                if (row[4]) {
+                    departmentCounts[row[4]] = (departmentCounts[row[4]] || 0) + 1;
+                }
+            });
+            
+            // Update summary
+            document.getElementById('totalWorks').textContent = data.length;
+            
+            const involvedSummary = document.getElementById('involvedSummary');
+            involvedSummary.innerHTML = '';
+            Object.entries(involvedCounts).forEach(([key, value]) => {
+                involvedSummary.innerHTML += `<div>${key}: <span class="font-semibold text-red-600">${value}</span> งาน</div>`;
+            });
+            
+            const departmentSummary = document.getElementById('departmentSummary');
+            departmentSummary.innerHTML = '';
+            Object.entries(departmentCounts).forEach(([key, value]) => {
+                departmentSummary.innerHTML += `<div>${key}: <span class="font-semibold text-red-600">${value}</span> งาน</div>`;
+            });
+            
+            // Show results
+            document.getElementById('loading1').classList.add('hidden');
+            document.getElementById('results1').classList.remove('hidden');
+            document.getElementById('results1').classList.add('fade-in');
+        }
+        
+        function clearSearch1() {
+            document.getElementById('personInvolved').value = '';
+            document.getElementById('department').value = '';
+            document.getElementById('workName').value = '';
+            document.getElementById('status').value = 'รอส่งงาน';
+            searchTeacherWorks();
+        }
+        
+        // Removed the downloadTeacherWorksCSV function as per request
+        
+        // Section 4: Activities
+        document.getElementById('searchBtn4').addEventListener('click', searchActivities);
+        document.getElementById('clearSearch4').addEventListener('click', clearSearch4);
+        
+        function searchActivities() {
+            const activityStartDate = document.getElementById('activityStartDate').value;
+            const activityEndDate = document.getElementById('activityEndDate').value;
+            const activityName = document.getElementById('activityName').value;
+            const activityDepartment = document.getElementById('activityDepartment').value;
+            
+            // Show loading
+            document.getElementById('loading4').classList.remove('hidden');
+            document.getElementById('results4').classList.add('hidden');
+            document.getElementById('noResults4').classList.add('hidden');
+            
+            // Fetch data
+            fetch(`${API_URL}?action=getActivities&sheetId=${SHEET_ID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to fetch data');
+                    }
+                    
+                    let filteredData = data.data;
+                    
+                    // Apply date range filter
+                    if (activityStartDate && activityEndDate) {
+                        filteredData = filteredData.filter(item => {
+                            const itemDate = dayjs(item[0]);
+                            const start = dayjs(activityStartDate);
+                            const end = dayjs(activityEndDate);
+                            return itemDate.isSameOrAfter(start, 'day') && itemDate.isSameOrBefore(end, 'day');
+                        });
+                    } else if (activityStartDate) {
+                        filteredData = filteredData.filter(item => {
+                            const itemDate = dayjs(item[0]);
+                            const start = dayjs(activityStartDate);
+                            return itemDate.isSameOrAfter(start, 'day');
+                        });
+                    } else if (activityEndDate) {
+                        filteredData = filteredData.filter(item => {
+                            const itemDate = dayjs(item[0]);
+                            const end = dayjs(activityEndDate);
+                            return itemDate.isSameOrBefore(end, 'day');
+                        });
+                    }
+                    
+                    if (activityName) {
+                        filteredData = filteredData.filter(item => 
+                            item[1].toLowerCase().includes(activityName.toLowerCase())
+                        );
+                    }
+                    
+                    if (activityDepartment) {
+                        filteredData = filteredData.filter(item => item[2] === activityDepartment);
+                    }
+                    
+                    // Sort by activity date (มากไปน้อย - descending)
+                    filteredData.sort((a, b) => {
+                        return new Date(b[0]) - new Date(a[0]);
+                    });
+                    
+                    // Display results
+                    displayActivities(filteredData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message || 'ไม่สามารถดึงข้อมูลได้',
+                        confirmButtonColor: '#ef4444'
+                    });
+                    document.getElementById('loading4').classList.add('hidden');
+                });
+        }
+        
+        function displayActivities(data) {
+            const tableBody = document.getElementById('activitiesTable');
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                document.getElementById('loading4').classList.add('hidden');
+                document.getElementById('results4').classList.add('hidden');
+                document.getElementById('noResults4').classList.remove('hidden');
+                return;
+            }
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // Format date
+                const activityDate = dayjs(row[0]).format('DD/MM/YYYY');
+                
+                // Create cells
+                tr.innerHTML = `
+                    <td>${activityDate}</td>
+                    <td>${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td>${isValidUrl(row[3]) ? 
+                        `<a href="${row[3]}" target="_blank" class="btn-primary px-3 py-1 rounded-md inline-block text-sm">ดูภาพกิจกรรม</a>` : 
+                        row[3] || '-'}
+                    </td>
+                `;
+                
+                tableBody.appendChild(tr);
+            });
+            
+            // Show results
+            document.getElementById('loading4').classList.add('hidden');
+            document.getElementById('results4').classList.remove('hidden');
+            document.getElementById('results4').classList.add('fade-in');
+        }
+        
+        function clearSearch4() {
+            document.getElementById('activityStartDate').value = '';
+            document.getElementById('activityEndDate').value = '';
+            document.getElementById('activityName').value = '';
+            document.getElementById('activityDepartment').value = '';
+            searchActivities();
+        }
+        
+        // Section 6: Orders
+        document.getElementById('searchBtn6').addEventListener('click', searchOrders);
+        document.getElementById('clearSearch6').addEventListener('click', clearSearch6);
+        
+        function searchOrders() {
+            const orderNumber = document.getElementById('orderNumber').value;
+            const orderDepartment = document.getElementById('orderDepartment').value;
+            const orderSubject = document.getElementById('orderSubject').value;
+            
+            // Show loading
+            document.getElementById('loading6').classList.remove('hidden');
+            document.getElementById('results6').classList.add('hidden');
+            document.getElementById('noResults6').classList.add('hidden');
+            
+            // Fetch data
+            fetch(`${API_URL}?action=getOrders&sheetId=${SHEET_ID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to fetch data');
+                    }
+                    
+                    let filteredData = data.data;
+                    
+                    // Apply filters
+                    if (orderNumber) {
+                        filteredData = filteredData.filter(item => 
+                            item[0].toString().toLowerCase().includes(orderNumber.toLowerCase())
+                        );
+                    }
+                    
+                    if (orderDepartment) {
+                        filteredData = filteredData.filter(item => item[2] === orderDepartment);
+                    }
+                    
+                    if (orderSubject) {
+                        filteredData = filteredData.filter(item => 
+                            item[3].toLowerCase().includes(orderSubject.toLowerCase())
+                        );
+                    }
+                    
+                    // Sort by order number (มากไปน้อย - descending)
+                    filteredData.sort((a, b) => {
+                        return parseInt(b[0]) - parseInt(a[0]);
+                    });
+                    
+                    // Display results
+                    displayOrders(filteredData);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message || 'ไม่สามารถดึงข้อมูลได้',
+                        confirmButtonColor: '#ef4444'
+                    });
+                    document.getElementById('loading6').classList.add('hidden');
+                });
+        }
+        
+        function displayOrders(data) {
+            const tableBody = document.getElementById('ordersTable');
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                document.getElementById('loading6').classList.add('hidden');
+                document.getElementById('results6').classList.add('hidden');
+                document.getElementById('noResults6').classList.remove('hidden');
+                return;
+            }
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                // Format date
+                const orderDate = dayjs(row[1]).format('DD/MM/YYYY');
+                
+                // Create cells
+                tr.innerHTML = `
+                    <td>${row[0]}</td>
+                    <td>${orderDate}</td>
+                    <td>${row[2]}</td>
+                    <td>${row[3]}</td>
+                    <td>${isValidUrl(row[4]) ? 
+                        `<a href="${row[4]}" target="_blank" class="btn-primary px-3 py-1 rounded-md inline-block text-sm">ดาวน์โหลด</a>` : 
+                        '-'}
+                    </td>
+                `;
+                
+                tableBody.appendChild(tr);
+            });
+            
+            // Show results
+            document.getElementById('loading6').classList.add('hidden');
+            document.getElementById('results6').classList.remove('hidden');
+            document.getElementById('results6').classList.add('fade-in');
+        }
+        
+        function clearSearch6() {
+            document.getElementById('orderNumber').value = '';
+            document.getElementById('orderDepartment').value = '';
+            document.getElementById('orderSubject').value = '';
+            searchOrders();
+        }
+        
+        // Section 8: Plan Data
+        function fetchPlanData() {
+            // Show loading
+            document.getElementById('loading8').classList.remove('hidden');
+            document.getElementById('results8').classList.add('hidden');
+            document.getElementById('noResults8').classList.add('hidden');
+            
+            // Fetch data
+            fetch(`${API_URL}?action=getPlanData&sheetId=${SHEET_ID}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to fetch data');
+                    }
+                    
+                    // Display results
+                    displayPlanData(data.data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: error.message || 'ไม่สามารถดึงข้อมูลได้',
+                        confirmButtonColor: '#ef4444'
+                    });
+                    document.getElementById('loading8').classList.add('hidden');
+                    document.getElementById('noResults8').classList.remove('hidden');
+                });
+        }
+        
+        function displayPlanData(data) {
+            if (!data || data.length === 0) {
+                document.getElementById('loading8').classList.add('hidden');
+                document.getElementById('results8').classList.add('hidden');
+                document.getElementById('noResults8').classList.remove('hidden');
+                return;
+            }
+            
+            const tableHead = document.getElementById('planTableHead');
+            const tableBody = document.getElementById('planTableBody');
+            
+            // Clear previous data
+            tableHead.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            // Create header row
+            const headerRow = document.createElement('tr');
+            for (let i = 0; i < 6; i++) {
+                const th = document.createElement('th');
+                th.textContent = data[0][i] || '';
+                headerRow.appendChild(th);
+            }
+            tableHead.appendChild(headerRow);
+            
+            // Create data rows (skip header row)
+            for (let i = 1; i < data.length; i++) {
+                const tr = document.createElement('tr');
+                
+                for (let j = 0; j < 6; j++) {
+                    const td = document.createElement('td');
+                    const cellValue = data[i][j] || '';
+                    
+                    if (isValidUrl(cellValue)) {
+                        const link = document.createElement('a');
+                        link.href = cellValue;
+                        link.target = '_blank';
+                        link.className = 'btn-primary px-3 py-1 rounded-md inline-block text-sm';
+                        link.textContent = 'เปิดลิงก์';
+                        td.appendChild(link);
+                    } else {
+                        td.textContent = cellValue;
+                    }
+                    
+                    tr.appendChild(td);
+                }
+                
+                tableBody.appendChild(tr);
+            }
+            
+            // Show results
+            document.getElementById('loading8').classList.add('hidden');
+            document.getElementById('results8').classList.remove('hidden');
+            document.getElementById('results8').classList.add('fade-in');
+        }
+        
+        // Helper function to check if a string is a valid URL
+        function isValidUrl(string) {
+            if (!string) return false;
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
